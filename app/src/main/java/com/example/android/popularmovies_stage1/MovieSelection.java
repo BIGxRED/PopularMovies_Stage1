@@ -1,5 +1,6 @@
 package com.example.android.popularmovies_stage1;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -7,13 +8,19 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MovieSelection extends AppCompatActivity {
 
     RecyclerView mRecyclerView;
     MovieAdapter mAdapter;
+    List<Movie> mMoviesList = new ArrayList<>();
 
-    private static final int NUMBER_OF_MOVIES = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,15 +33,17 @@ public class MovieSelection extends AppCompatActivity {
 
         mRecyclerView.setHasFixedSize(true);
 
-        mAdapter = new MovieAdapter(NUMBER_OF_MOVIES);
+        mAdapter = new MovieAdapter(mMoviesList);
         mRecyclerView.setAdapter(mAdapter);
+
+        new FetchMoviesTask().execute();
     }
 
     private class MovieAdapter extends RecyclerView.Adapter<MovieHolder>{
-        private int mNumberOfMovies;
+        private List<Movie> adapterMovies;
 
-        public MovieAdapter(int numberOfMovies){
-            mNumberOfMovies = numberOfMovies;
+        public MovieAdapter(List<Movie> movies){
+            adapterMovies = movies;
         }
 
         @Override
@@ -47,22 +56,43 @@ public class MovieSelection extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(MovieHolder holder, int position){
-
+            Movie currentMovie = adapterMovies.get(position);
+            Picasso.with(getApplicationContext())
+                    .load("https://image.tmdb.org/t/p/w185/" + currentMovie.getPosterPath())
+                    .into(holder.holderImageView);
         }
 
         @Override
         public int getItemCount(){
-            return mNumberOfMovies;
+            return adapterMovies.size();
         }
 
     }
 
     private class MovieHolder extends RecyclerView.ViewHolder{
+        ImageView holderImageView;
 
         public MovieHolder(View movieView){
             super(movieView);
+            holderImageView = (ImageView) movieView.findViewById(R.id.list_item_image_view);
         }
 
 
+    }
+
+
+    private class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>>{
+        @Override
+        protected List<Movie> doInBackground(Void... params){
+            return new MovieFetcher().fetchMovies();
+        }
+
+        @Override
+        protected void onPostExecute(List<Movie> parsedMovies){
+            mMoviesList = parsedMovies;
+//            mAdapter.notifyDataSetChanged();  Unsure of why this is not working as I expected?
+            mAdapter = new MovieAdapter(mMoviesList);
+            mRecyclerView.setAdapter(mAdapter);
+        }
     }
 }
