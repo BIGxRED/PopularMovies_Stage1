@@ -22,24 +22,40 @@ import java.util.Scanner;
 
 public class MovieFetcher {
     private static final String TAG = "MovieFetcher";
-    private static final String API_KEY = "your API key";
 
-    private static final String MOVIEDB_BASE_URL = "https://api.themoviedb.org/3/discover/movie";
+//    private static final String MOVIEDB_BASE_URL_DISCOVER =
+//            "https://api.themoviedb.org/3/discover/movie";
+
+    //Constants used for building the base URL
+    private static final String MOVIEDB_BASE_URL = "https://api.themoviedb.org/3/movie";
+    private static final String METHOD_MOVIE_POPULAR = "popular";
+    private static final String METHOD_MOVIE_TOP_RATED = "top_rated";
+
+    //Parameters to be used with the query
     private static final String PARAM_API_KEY = "api_key";
-    private static final String PARAM_SORT_BY = "sort_by";
+    private static final String PARAM_LANGUAGE = "language";
+    private static final String PARAM_PAGE = "page";
 
-    private static final String SORT_BY = "popularity.desc";
+    //Parameter values to be used when building the URL
+//    private static final String PARAM_SORT_BY = "sort_by";
+//    private static final String SORT_BY = "popularity.desc";
+    private static final String API_KEY = "";
+    private static final String LANGUAGE = "en-US";
+    public static int page = 1;
 
     public static URL buildURL(){
         Uri builtUri = Uri.parse(MOVIEDB_BASE_URL).buildUpon()
+                .appendPath(METHOD_MOVIE_POPULAR)
                 .appendQueryParameter(PARAM_API_KEY, API_KEY)
-                .appendQueryParameter(PARAM_SORT_BY, SORT_BY)
+                .appendQueryParameter(PARAM_LANGUAGE, LANGUAGE)
+                .appendQueryParameter(PARAM_PAGE, Integer.toString(page))
                 .build();
 
         URL url = null;
 
         try{
             url = new URL(builtUri.toString());
+            Log.i(TAG, "The resulting built URL: " + url.toString());
         }
         catch (MalformedURLException mue){
             mue.printStackTrace();
