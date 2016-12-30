@@ -1,19 +1,18 @@
 package com.example.android.popularmovies_stage1;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -23,6 +22,7 @@ import java.util.List;
 public class MovieSelection extends AppCompatActivity {
 
     public static final String TAG = "MovieSelection";
+    public static final String EXTRA_PARCEL = "com.example.android.popularmovies_stage1.parcel";
 
     RecyclerView mRecyclerView;
     MovieAdapter mAdapter;
@@ -43,7 +43,7 @@ public class MovieSelection extends AppCompatActivity {
         mAdapter = new MovieAdapter(mMoviesList);
         mRecyclerView.setAdapter(mAdapter);
 
-        new FetchMoviesTask().execute();
+        new FetchMoviesTask().execute(0);
     }
 
     private class MovieAdapter extends RecyclerView.Adapter<MovieHolder>{
@@ -76,12 +76,21 @@ public class MovieSelection extends AppCompatActivity {
 
     }
 
-    private class MovieHolder extends RecyclerView.ViewHolder{
+    private class MovieHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView holderImageView;
 
         public MovieHolder(View movieView){
             super(movieView);
             holderImageView = (ImageView) movieView.findViewById(R.id.list_item_image_view);
+            movieView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view){
+            Movie clickedMovie = mMoviesList.get(mRecyclerView.getChildAdapterPosition(view));
+            Intent movieDetailsIntent = new Intent(getApplicationContext(), MovieDetails.class);
+            movieDetailsIntent.putExtra(EXTRA_PARCEL, clickedMovie);
+            startActivity(movieDetailsIntent);
         }
 
 
@@ -95,12 +104,14 @@ public class MovieSelection extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch(item.getItemId()) {
                     case R.id.sort_by_popular:
-                        Toast.makeText(getApplicationContext(), "This should sort movies by popularity", Toast.LENGTH_SHORT).show();
-                        Log.i(TAG, "Sort by popular has been clicked");
+//                        Toast.makeText(getApplicationContext(), "This should sort movies by popularity", Toast.LENGTH_SHORT).show();
+//                        Log.i(TAG, "Sort by popular has been clicked");
+                        new FetchMoviesTask().execute(0);
                         return true;
                     case R.id.sort_by_top_rated:
-                        Toast.makeText(getApplicationContext(), "This should sort movies by top rated", Toast.LENGTH_SHORT).show();
-                        Log.i(TAG, "Sort by top rated has been clicked");
+//                        Toast.makeText(getApplicationContext(), "This should sort movies by top rated", Toast.LENGTH_SHORT).show();
+//                        Log.i(TAG, "Sort by top rated has been clicked");
+                        new FetchMoviesTask().execute(1);
                         return true;
                     default:
                         return true;
@@ -133,14 +144,15 @@ public class MovieSelection extends AppCompatActivity {
     }
 
 
-    private class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>>{
+    private class FetchMoviesTask extends AsyncTask<Integer, Void, List<Movie>>{
         @Override
-        protected List<Movie> doInBackground(Void... params){
-            return new MovieFetcher().fetchMovies();
+        protected List<Movie> doInBackground(Integer... params){
+            return new MovieFetcher().fetchMovies(params[0]);
         }
 
         @Override
         protected void onPostExecute(List<Movie> parsedMovies){
+            mMoviesList.clear();
             mMoviesList.addAll(parsedMovies);
             mAdapter.notifyDataSetChanged();
         }

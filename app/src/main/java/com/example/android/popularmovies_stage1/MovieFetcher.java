@@ -23,9 +23,6 @@ import java.util.Scanner;
 public class MovieFetcher {
     private static final String TAG = "MovieFetcher";
 
-//    private static final String MOVIEDB_BASE_URL_DISCOVER =
-//            "https://api.themoviedb.org/3/discover/movie";
-
     //Constants used for building the base URL
     private static final String MOVIEDB_BASE_URL = "https://api.themoviedb.org/3/movie";
     private static final String METHOD_MOVIE_POPULAR = "popular";
@@ -37,15 +34,26 @@ public class MovieFetcher {
     private static final String PARAM_PAGE = "page";
 
     //Parameter values to be used when building the URL
-//    private static final String PARAM_SORT_BY = "sort_by";
-//    private static final String SORT_BY = "popularity.desc";
     private static final String API_KEY = "";
     private static final String LANGUAGE = "en-US";
     public static int page = 1;
 
-    public static URL buildURL(){
+    public static URL buildURL(int methodFlag){
+        String queryMethod;
+        switch (methodFlag){
+            case 0:
+                queryMethod = METHOD_MOVIE_POPULAR;
+                break;
+            case 1:
+                queryMethod = METHOD_MOVIE_TOP_RATED;
+                break;
+            default:
+                queryMethod = METHOD_MOVIE_POPULAR;
+                break;
+        }
+
         Uri builtUri = Uri.parse(MOVIEDB_BASE_URL).buildUpon()
-                .appendPath(METHOD_MOVIE_POPULAR)
+                .appendPath(queryMethod)
                 .appendQueryParameter(PARAM_API_KEY, API_KEY)
                 .appendQueryParameter(PARAM_LANGUAGE, LANGUAGE)
                 .appendQueryParameter(PARAM_PAGE, Integer.toString(page))
@@ -100,11 +108,11 @@ public class MovieFetcher {
         }
     }
 
-    public List<Movie> fetchMovies(){
+    public List<Movie> fetchMovies(int methodFlag){
         //TODO: Keep an eye out on this line of code, I fear that this may cause issues later on
         List<Movie> movies = new ArrayList<>();
         try {
-            String httpResponse = getHTTPResponse(buildURL());
+            String httpResponse = getHTTPResponse(buildURL(methodFlag));
             parseMovies(httpResponse, movies);
         }
         catch(IOException ioe){
