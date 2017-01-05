@@ -27,6 +27,8 @@ public class MovieSelection extends AppCompatActivity {
     RecyclerView mRecyclerView;
     MovieAdapter mAdapter;
     List<Movie> mMoviesList = new ArrayList<>();
+    int mPageNumber;
+    int mMethodFlag;
 
 
     @Override
@@ -42,8 +44,22 @@ public class MovieSelection extends AppCompatActivity {
 
         mAdapter = new MovieAdapter(mMoviesList);
         mRecyclerView.setAdapter(mAdapter);
+        mPageNumber = 1;
+        mMethodFlag = 0;
 
-        new FetchMoviesTask().execute(0);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView view, int dx, int dy){
+                super.onScrolled(view, dx, dy);
+                if(dy > 0){
+                    if(!mRecyclerView.canScrollVertically(1)){
+                        new FetchMoviesTask().execute();
+                    }
+                }
+            }
+        });
+
+        new FetchMoviesTask().execute();
     }
 
     private class MovieAdapter extends RecyclerView.Adapter<MovieHolder>{
@@ -104,14 +120,16 @@ public class MovieSelection extends AppCompatActivity {
             public boolean onMenuItemClick(MenuItem item) {
                 switch(item.getItemId()) {
                     case R.id.sort_by_popular:
-//                        Toast.makeText(getApplicationContext(), "This should sort movies by popularity", Toast.LENGTH_SHORT).show();
-//                        Log.i(TAG, "Sort by popular has been clicked");
-                        new FetchMoviesTask().execute(0);
+                        mMoviesList.clear();
+                        mPageNumber = 1;
+                        mMethodFlag = 0;
+                        new FetchMoviesTask().execute();
                         return true;
                     case R.id.sort_by_top_rated:
-//                        Toast.makeText(getApplicationContext(), "This should sort movies by top rated", Toast.LENGTH_SHORT).show();
-//                        Log.i(TAG, "Sort by top rated has been clicked");
-                        new FetchMoviesTask().execute(1);
+                        mMoviesList.clear();
+                        mPageNumber = 1;
+                        mMethodFlag = 1;
+                        new FetchMoviesTask().execute();
                         return true;
                     default:
                         return true;
@@ -144,17 +162,17 @@ public class MovieSelection extends AppCompatActivity {
     }
 
 
-    private class FetchMoviesTask extends AsyncTask<Integer, Void, List<Movie>>{
+    private class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>>{
         @Override
-        protected List<Movie> doInBackground(Integer... params){
-            return new MovieFetcher().fetchMovies(params[0]);
+        protected List<Movie> doInBackground(Void... params){
+            return new MovieFetcher().fetchMovies(mMethodFlag, mPageNumber);
         }
 
         @Override
         protected void onPostExecute(List<Movie> parsedMovies){
-            mMoviesList.clear();
             mMoviesList.addAll(parsedMovies);
             mAdapter.notifyDataSetChanged();
+            mPageNumber++;
         }
     }
 }

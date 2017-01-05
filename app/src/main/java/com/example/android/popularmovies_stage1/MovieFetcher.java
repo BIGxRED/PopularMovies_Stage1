@@ -36,9 +36,9 @@ public class MovieFetcher {
     //Parameter values to be used when building the URL
     private static final String API_KEY = "";
     private static final String LANGUAGE = "en-US";
-    public static int page = 1;
+//    public static int page = 1;
 
-    public static URL buildURL(int methodFlag){
+    public static URL buildURL(int methodFlag, int pageNumber){
         String queryMethod;
         switch (methodFlag){
             case 0:
@@ -56,7 +56,7 @@ public class MovieFetcher {
                 .appendPath(queryMethod)
                 .appendQueryParameter(PARAM_API_KEY, API_KEY)
                 .appendQueryParameter(PARAM_LANGUAGE, LANGUAGE)
-                .appendQueryParameter(PARAM_PAGE, Integer.toString(page))
+                .appendQueryParameter(PARAM_PAGE, Integer.toString(pageNumber))
                 .build();
 
         URL url = null;
@@ -100,19 +100,34 @@ public class MovieFetcher {
             int ID = jsonMovie.getInt("id");
             String posterPath = jsonMovie.getString("poster_path");
             String overview = jsonMovie.getString("overview");
+            String releaseDate = jsonMovie.getString("release_date");
+            int voteCount = jsonMovie.getInt("vote_count");
+            //getDouble() is being used in this case because a double is essentially a float, only
+            //with a higher precision (more decimal values); therefore, the correct value should be
+            //obtained if the returned double is cast into a float
+            float voteAverage = (float) jsonMovie.getDouble("vote_average");
+            String backdropPath = jsonMovie.getString("backdrop_path");
 
-            Movie movie = new Movie(title, ID, posterPath, overview);
-            Log.i(TAG, movie.getTitle() + " has been added to the array");
+            Movie movie = new Movie(title, ID, posterPath, overview, releaseDate, voteCount,
+                    voteAverage, backdropPath);
+            Log.i(TAG, movie.getTitle() + " has been added to the array"
+                    + "\nID: " + Integer.toString(movie.getID())
+                    + "\nPoster path: " + movie.getPosterPath()
+                    + "\nOverview: " + movie.getOverview()
+                    + "\nRelease date: " + movie.getReleaseDate()
+                    + "\nVote count: " + Integer.toString(movie.getVoteCount())
+                    + "\nVote average: " + Float.toString(movie.getVoteAverage())
+                    + "\nBackdrop path: " + movie.getBackdropPath() + "\n");
             moviesList.add(movie);
 
         }
     }
 
-    public List<Movie> fetchMovies(int methodFlag){
+    public List<Movie> fetchMovies(int methodFlag, int pageNumber){
         //TODO: Keep an eye out on this line of code, I fear that this may cause issues later on
         List<Movie> movies = new ArrayList<>();
         try {
-            String httpResponse = getHTTPResponse(buildURL(methodFlag));
+            String httpResponse = getHTTPResponse(buildURL(methodFlag, pageNumber));
             parseMovies(httpResponse, movies);
         }
         catch(IOException ioe){

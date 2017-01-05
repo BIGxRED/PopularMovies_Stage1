@@ -13,12 +13,21 @@ public class Movie implements Parcelable {
     int mID;
     String mPosterPath;
     String mOverview;
+    String mReleaseDate;
+    int mVoteCount;
+    float mVoteAverage;
+    String mBackdropPath;
 
-    public Movie(String title, int ID, String posterPath, String overview){
+    public Movie(String title, int ID, String posterPath, String overview, String releaseDate,
+                 int voteCount, float voteAverage, String backdropPath){
         mTitle = title;
         mID = ID;
         mPosterPath = posterPath;
         mOverview = overview;
+        mReleaseDate = releaseDate;
+        mVoteCount = voteCount;
+        mVoteAverage = voteAverage;
+        mBackdropPath = backdropPath;
     }
 
     public Movie(Parcel in){
@@ -26,6 +35,10 @@ public class Movie implements Parcelable {
         mID = in.readInt();
         mPosterPath = in.readString();
         mOverview = in.readString();
+        mReleaseDate = in.readString();
+        mVoteCount = in.readInt();
+        mVoteAverage = in.readFloat();
+        mBackdropPath = in.readString();
     }
 
     public String getTitle() {
@@ -56,8 +69,40 @@ public class Movie implements Parcelable {
         return mOverview;
     }
 
-    public void setmOverview(String mOverview) {
+    public void setOverview(String mOverview) {
         this.mOverview = mOverview;
+    }
+
+    public String getReleaseDate(){
+        return mReleaseDate;
+    }
+
+    public void setReleaseDate(String mReleaseDate){
+        this.mReleaseDate = mReleaseDate;
+    }
+
+    public int getVoteCount(){
+        return mVoteCount;
+    }
+
+    public void setVoteCount(int mVoteCount){
+        this.mVoteCount = mVoteCount;
+    }
+
+    public float getVoteAverage(){
+        return mVoteAverage;
+    }
+
+    public void setVoteAverage(float mVoteAverage){
+        this.mVoteAverage = mVoteAverage;
+    }
+
+    public String getBackdropPath(){
+        return mBackdropPath;
+    }
+
+    public void setBackdropPath(String mBackdropPath){
+        this.mBackdropPath = mBackdropPath;
     }
 
     @Override
@@ -77,6 +122,10 @@ public class Movie implements Parcelable {
         out.writeInt(mID);
         out.writeString(mPosterPath);
         out.writeString(mOverview);
+        out.writeString(mReleaseDate);
+        out.writeInt(mVoteCount);
+        out.writeFloat(mVoteAverage);
+        out.writeString(mBackdropPath);
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>(){

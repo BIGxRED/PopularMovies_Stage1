@@ -3,7 +3,6 @@ package com.example.android.popularmovies_stage1;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,6 +15,9 @@ public class MovieDetails extends AppCompatActivity {
     ImageView mMoviePoster;
     TextView mMovieTitle;
     TextView mMovieOverview;
+    TextView mMovieReleaseDate;
+    TextView mMovieVoteCount;
+    TextView mMovieVoteAverage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,9 @@ public class MovieDetails extends AppCompatActivity {
         mMoviePoster = (ImageView) findViewById(R.id.iv_movie_poster);
         mMovieTitle = (TextView) findViewById(R.id.tv_movie_title);
         mMovieOverview = (TextView) findViewById(R.id.tv_movie_overview);
+        mMovieReleaseDate = (TextView) findViewById(R.id.tv_movie_release_date);
+        mMovieVoteCount = (TextView) findViewById(R.id.tv_movie_vote_count);
+        mMovieVoteAverage = (TextView) findViewById(R.id.tv_movie_vote_average);
 
         Intent receivedIntent = getIntent();
         Movie receivedMovie = null;
@@ -34,8 +39,10 @@ public class MovieDetails extends AppCompatActivity {
         Picasso.with(getApplicationContext())
                 .load("https://image.tmdb.org/t/p/w185/" + receivedMovie.getPosterPath())
                 .into(mMoviePoster);
-        Log.i(TAG, "This is the full poster path: " + "https://image.tmdb.org/t/p/w185/" + receivedMovie.getPosterPath());
         mMovieTitle.setText(receivedMovie.getTitle());
         mMovieOverview.setText(receivedMovie.getOverview());
+        mMovieReleaseDate.setText(receivedMovie.getReleaseDate());
+        mMovieVoteCount.setText("Vote count: " + receivedMovie.getVoteCount());
+        mMovieVoteAverage.setText(Float.toString(receivedMovie.getVoteAverage()) + "/10");
     }
 }
