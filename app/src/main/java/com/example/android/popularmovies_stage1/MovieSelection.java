@@ -23,10 +23,11 @@ public class MovieSelection extends AppCompatActivity {
 
     public static final String TAG = "MovieSelection";
     public static final String EXTRA_PARCEL = "com.example.android.popularmovies_stage1.parcel";
+    public static final String EXTRA_ID = "com.example.android.popularmovies_stage1.id";
 
     RecyclerView mRecyclerView;
     MovieAdapter mAdapter;
-    List<Movie> mMoviesList = new ArrayList<>();
+    ArrayList<Movie> mMoviesList = new ArrayList<>();
     int mPageNumber;
     int mMethodFlag;
 
@@ -105,7 +106,8 @@ public class MovieSelection extends AppCompatActivity {
         public void onClick(View view){
             Movie clickedMovie = mMoviesList.get(mRecyclerView.getChildAdapterPosition(view));
             Intent movieDetailsIntent = new Intent(getApplicationContext(), MovieDetails.class);
-            movieDetailsIntent.putExtra(EXTRA_PARCEL, clickedMovie);
+            movieDetailsIntent.putParcelableArrayListExtra(EXTRA_PARCEL, mMoviesList);
+            movieDetailsIntent.putExtra(EXTRA_ID, clickedMovie.getID());
             startActivity(movieDetailsIntent);
         }
 
