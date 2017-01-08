@@ -1,23 +1,30 @@
+/*
+The following code is the property and sole work of Mike Palarz, a student at Udacity
+ */
+
 package com.example.android.popularmovies_stage1;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by mike on 12/26/16.
+/*
+This class was created in order to store all of the data obtained through TheMovieDB API. This class
+ implements the parcelable interface so that it can be easily passed on to the MovieDetails class
+ through an intent within MovieSelection.
  */
 
 public class Movie implements Parcelable {
 
-    String mTitle;
-    int mID;
-    String mPosterPath;
-    String mOverview;
-    String mReleaseDate;
-    int mVoteCount;
-    float mVoteAverage;
-    String mBackdropPath;
+    String mTitle;  //String used to store the movie title
+    int mID;    //integer used to store the unique movie ID
+    String mPosterPath; //String used to store the relative path of the movie poster image
+    String mOverview;   //String used to store the plot synposis
+    String mReleaseDate;    //String used to store the movie's release date
+    int mVoteCount; //integer used to store the number of votes a movie received
+    float mVoteAverage; //float used to store the average vote value
+    String mBackdropPath;   //String used to store the relative path of the movie backdrop image
 
+    //Default constructor of a Movie object
     public Movie(String title, int ID, String posterPath, String overview, String releaseDate,
                  int voteCount, float voteAverage, String backdropPath){
         mTitle = title;
@@ -30,6 +37,7 @@ public class Movie implements Parcelable {
         mBackdropPath = backdropPath;
     }
 
+    //Constructor required to implement the Parcelable interface
     public Movie(Parcel in){
         mTitle = in.readString();
         mID = in.readInt();
@@ -40,6 +48,8 @@ public class Movie implements Parcelable {
         mVoteAverage = in.readFloat();
         mBackdropPath = in.readString();
     }
+
+    /*Getter and Setter Methods*/
 
     public String getTitle() {
         return mTitle;
@@ -107,15 +117,27 @@ public class Movie implements Parcelable {
 
     @Override
     public String toString(){
-        return mOverview;
+        return "Title: " + mTitle
+               + "\nID: " + Integer.toString(mID)
+               + "\nPoster path: " + mPosterPath
+               + "\nOverview: " + mOverview
+               + "\nRelease date: " + mReleaseDate
+               + "\nVote count: " + Integer.toString(mVoteCount)
+               + "\nVote average: " + Float.toString(mVoteAverage)
+               + "\nBackdrop path: " + mBackdropPath + "\n";
     }
 
-    //Methods required for the parcelable interface
+    /* Methods required for the parcelable interface*/
+
+    //A method which specifies if special Objects are being "flattened" into a Parcel, such as an
+    //Object which contained a file descriptor. In the case of a Movie, this is not needed so the
+    //method simply returns 0.
     @Override
     public int describeContents(){
         return 0;
     }
 
+    //This method "flattens" a Movie object into a Parcel
     @Override
     public void writeToParcel(Parcel out,int flags){
         out.writeString(mTitle);
@@ -129,10 +151,14 @@ public class Movie implements Parcelable {
     }
 
     public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>(){
+
+        //This method "unpacks" the Movie; a new Movie instance is created which is instantiated by
+        //the parcel that had originally been created within writeToParcel()
         public Movie createFromParcel(Parcel in){
             return new Movie(in);
         }
 
+        //This method creates a new array of the parcelable Movie class
         public Movie[] newArray(int size){
             return new Movie[size];
         }
